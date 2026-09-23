@@ -72,6 +72,12 @@ resource "google_container_node_pool" "gpu" {
   }
 
   lifecycle {
+    # GKE only uses this value when creating the node pool. Event-day capacity
+    # changes are controlled by the autoscaling bounds below; treating the
+    # creation-time count as mutable would replace the entire pool during a
+    # routine scale-down.
+    ignore_changes = [initial_node_count]
+
     precondition {
       condition = (
         var.gpu_min_node_count <= var.gpu_initial_node_count &&
